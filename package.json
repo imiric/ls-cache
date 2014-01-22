@@ -1,0 +1,40 @@
+{
+  "name": "lscache",
+  "version": "0.0.1",
+  "description": "lscache with browserify support",
+  "main": "lscache.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "karma start --single-run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mWater/lscache.git"
+  },
+  "keywords": [
+    "localStorage"
+  ],
+  "author": "Clayton Grassick",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mWater/lscache/issues"
+  },
+  "homepage": "https://github.com/mWater/lscache",
+  "devDependencies": {
+    "mocha": "~1.17.0",
+    "karma-chrome-launcher": "~0.1.2",
+    "karma-html2js-preprocessor": "~0.1.0",
+    "karma-firefox-launcher": "~0.1.3",
+    "karma-script-launcher": "~0.1.0",
+    "karma-jasmine": "~0.1.5",
+    "karma-coffee-preprocessor": "~0.1.2",
+    "requirejs": "~2.1.10",
+    "karma-requirejs": "~0.2.1",
+    "karma-phantomjs-launcher": "~0.1.1",
+    "karma": "~0.10.9",
+    "karma-mocha": "~0.1.1",
+    "karma-browserify": "0.0.6"
+  }
+}
