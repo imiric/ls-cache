@@ -1,4 +1,6 @@
 //var originalConsole = window.console;
+mocha.ui("tdd");
+
 var assert = require("assert");
 var lscache = require("../lib/lscache");
 
