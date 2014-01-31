@@ -2,9 +2,9 @@ var originalConsole = window.console;
 mocha.ui("tdd");
 
 var assert = require("assert");
-var lscache = require("../lib/lscache");
+var lscache = require("../lib/ls-cache");
 
-suite('lscache', function() {
+suite('ls-cache', function() {
   setup(function() {
     // Reset localStorage before each test
     try {
@@ -24,9 +24,20 @@ suite('lscache', function() {
   test('Testing set() and get() with string', function() {
     var key = 'thekey';
     var value = 'thevalue'
-    lscache.set(key, value, 1);
+    lscache.set(key, value);
     if (lscache.supported()) {
-      assert.equal(lscache.get(key), value, 'We expect value to be ' + value);
+      assert.deepEqual(lscache.get(key), value, 'We expect value to be ' + value);
+    } else {
+      assert.equal(lscache.get(key), null, 'We expect null value');
+    }
+  });
+
+  test('Testing set() and get() with object', function() {
+    var key = 'thekey';
+    var value = { a: 4, b: 2};
+    lscache.set(key, value);
+    if (lscache.supported()) {
+      assert.deepEqual(lscache.get(key), value, 'We expect value to be ' + value);
     } else {
       assert.equal(lscache.get(key), null, 'We expect null value');
     }
@@ -68,21 +79,46 @@ suite('lscache', function() {
       assert.equal(localStorage.getItem('outside-cache'), 'not part of lscache', 'We expect localStorage value to still persist');
     });
 
-    test('Testing setBucket()', function() {
+    test("Testing flush() doesn't affect sub-bucket", function() {
+      sub = lscache.createBucket("tmp");
       var key = 'thekey';
-      var value1 = 'awesome';
-      var value2 = 'awesomer';
-      var bucketName = 'BUCKETONE';
+      var key2 = 'thekey';
+      lscache.set(key, 'bla', 100);
+      sub.set(key2, 'bla', 100);
 
-      lscache.set(key, value1, 1);
-      lscache.setBucket(bucketName);
-      lscache.set(key, value2, 1);
-
-      assert.equal(lscache.get(key), value2, 'We expect "' + value2 + '" to be returned for the current bucket: ' + bucketName);
       lscache.flush();
-      assert.equal(lscache.get(key), null, 'We expect "' + value2 + '" to be flushed for the current bucket');
-      lscache.resetBucket();
-      assert.equal(lscache.get(key), value1, 'We expect "' + value1 + '", the non-bucket value, to persist');
+      assert.equal(lscache.get(key), null, 'We expect flushed value to be null');
+      assert.equal(sub.get(key2), 'bla', 'We expect sub-bucket value to still persist');
+    });
+
+    test("Testing buckets are independant", function() {
+      sub = lscache.createBucket("tmp");
+      var key = 'thekey';
+      lscache.set(key, 'foo', 100);
+      sub.set(key, 'bar', 100);
+
+      assert.equal(lscache.get(key), 'foo', 'We expect foo');
+      assert.equal(sub.get(key), 'bar', 'We expect bar');
+    });
+
+    test("Testing buckets can be listed", function() {
+      sub = lscache.createBucket("tmp");
+      var key = 'thekey';
+      var key2 = 'thekey2';
+      lscache.set(key, 'foo', 100);
+      sub.set(key, 'bar', 100);
+      sub.set(key2, 'bar2', 100);
+
+      assert.deepEqual(lscache.keys().sort(), [key].sort());
+      assert.deepEqual(sub.keys().sort(), [key, key2].sort());
+    });
+
+    test("Testing buckets can contain special characters", function() {
+      sub = lscache.createBucket("!@#$!#$%?//");
+      var key = 'thekey';
+      sub.set(key, 'foo', 100);
+
+      assert.equal(sub.get(key), 'foo', 'We expect foo');
     });
 
     test('Testing setWarnings()', function() {
@@ -104,7 +140,7 @@ suite('lscache', function() {
       localStorage.clear()
 
       for (var i = 0; i <= num; i++) {
-        lscache.set("key" + i, longString);
+        lscache.set("key" + i, longString, i);
       }
 
       // Warnings not enabled, nothing should be logged
@@ -114,9 +150,6 @@ suite('lscache', function() {
 
       lscache.set("key" + i, longString);
       assert.equal(window.console.calls, 1, "We expect one warning to have been printed");
-
-      window.console = null;
-      lscache.set("key" + i, longString);
     });
 
     test('Testing quota exceeding', function() {
@@ -136,6 +169,7 @@ suite('lscache', function() {
         }
       }
       localStorage.clear();
+
       // Now add enough to go over the limit
       var approxLimit = num * stringLength;
       var numKeys = Math.ceil(approxLimit/(stringLength+8)) + 1;
@@ -156,12 +190,16 @@ suite('lscache', function() {
 
       // Try the same with no expiry times
       localStorage.clear();
-      for (var i = 0; i <= numKeys; i++) {
-        var currentKey = key + i;
-        lscache.set(currentKey, longString);
-      }
-      // Test that latest added is still there
-      assert.equal(lscache.get(currentKey), longString, 'We expect value to be set');
+
+      assert.throws(function() {
+        for (var i = 0; i <= numKeys; i++) {
+          var currentKey = key + i;
+          lscache.set(currentKey, longString);
+        }
+      });
+
+      // Test that first added is still there
+      assert.equal(lscache.get(key + 0), longString, 'We expect value to be set');
     });
   }
 });

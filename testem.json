@@ -7,7 +7,7 @@
     ],
     "launchers": {
     },
-    "before_tests": "browserify test/*tests.js -o test/browserified.js",
+    "before_tests": "browserify --debug test/*tests.js -o test/browserified.js",
     "on_exit": "rm test/browserified.js",
     "launch_in_dev": [ "chrome" ]
 }

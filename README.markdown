@@ -6,7 +6,7 @@ and associate an expiration time with each piece of data. If the `localStorage` 
 Methods
 -------
 
-The library exposes 5 methods: `set()`, `get()`, `remove()`, `flush()`, and `setBucket()`.
+The library exposes methods: `set()`, `get()`, `remove()`, `flush()`, `createBucket()` and `keys()`.
 
 * * *
 
@@ -14,7 +14,7 @@ The library exposes 5 methods: `set()`, `get()`, `remove()`, `flush()`, and `set
 Stores the value in localStorage. Expires after specified number of minutes.
 #### Arguments
 1. `key` (**string**)
-2. `value` (**Object|string**)
+2. `value` (**Object**)
 3. `time` (**number: optional**)
 
 * * *
@@ -24,7 +24,14 @@ Retrieves specified value from localStorage, if not expired.
 #### Arguments
 1. `key` (**string**)
 #### Returns
-**string | Object** : The stored value.
+**Object** : The stored value.
+
+* * *
+
+### lscache.keys
+Gets list of all keys in bucket
+#### Returns
+**Array** : Key names
 
 * * *
 
@@ -36,12 +43,12 @@ Removes a value from localStorage.
 * * *
 
 ### lscache.flush
-Removes all lscache items from localStorage without affecting other data.
+Removes all lscache items in current bucket from localStorage without affecting other data.
 
 * * *
 
-### lscache.setBucket
-Appends CACHE_PREFIX so lscache will partition data in to different buckets
+### lscache.createBucket
+Creates a sub-bucket which is completely independent. However, its expirable items may be cleared to make room for more keys.
 #### Arguments
 1. `bucket` (**string**)
 
@@ -89,69 +96,17 @@ alert(lscache.get('data').name);
 If you have multiple instances of lscache running on the same domain, you can partition data in a certain bucket via:
 
 ```js
-lscache.set('response', '...', 2);
-lscache.setBucket('lib');
+bucket = lscache.createBucket("something");
+bucket.set('response', '...', 2);
 lscache.set('path', '...', 2);
-lscache.flush(); //only removes 'path' which was set in the lib bucket
+lscache.flush(); //only removes 'path' which was set in the root bucket, not the sub-bucket
 ```
 
-For more live examples, play around with the demo here:
-http://pamelafox.github.com/lscache/demo.html
-
-
-Real-World Usage
-----------
-This library was originally developed with the use case of caching results of JSON API queries
-to speed up my webapps and give them better protection against flaky APIs.
-(More on that in this [blog post](http://blog.pamelafox.org/2010/10/lscache-localstorage-based-memcache.html))
-
-For example, [RageTube](http://ragetube.net) uses `lscache` to fetch Youtube API results for 10 minutes:
+Buckets are nestable:
 
 ```js
-var key = 'youtube:' + query;
-var json = lscache.get(key);
-if (json) {
-  processJSON(json);
-} else {
-  fetchJSON(query);
-}
-
-function processJSON(json) {
-  // ..
-}
-
-function fetchJSON() {
-  var searchUrl = 'http://gdata.youtube.com/feeds/api/videos';
-  var params = {
-   'v': '2', 'alt': 'jsonc', 'q': encodeURIComponent(query)
-  }
-  JSONP.get(searchUrl, params, null, function(json) {
-    processJSON(json);
-    lscache.set(key, json, 10);
-  });
-}
-```
-
-It does not have to be used for only expiration-based caching, however. It can also be used as just a wrapper for `localStorage`, as it provides the benefit of handling JS object (de-)serialization.
-
-For example, the [QuizCards](http://quizcards.info) Chrome extensions use `lscache`
-to store the user statistics for each user bucket, and those stats are an array
-of objects.
-
-```js
-function initBuckets() {
-  var bucket1 = [];
-  for (var i = 0; i < CARDS_DATA.length; i++) {
-    var datum = CARDS_DATA[i];
-    bucket1.push({'id': datum.id, 'lastAsked': 0});
-  }
-  lscache.set(LS_BUCKET + 1, bucket1);
-  lscache.set(LS_BUCKET + 2, []);
-  lscache.set(LS_BUCKET + 3, []);
-  lscache.set(LS_BUCKET + 4, []);
-  lscache.set(LS_BUCKET + 5, []);
-  lscache.set(LS_INIT, 'true')
-}
+bucket = lscache.createBucket("firstlevel");
+bucket2 = bucket.createBucket("secondlevel");
 ```
 
 Browser Support
