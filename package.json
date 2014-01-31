@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "karma start --single-run"
+    "test": "testem ci"
   },
   "repository": {
     "type": "git",
