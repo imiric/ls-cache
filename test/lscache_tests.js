@@ -5,11 +5,14 @@ var assert = require("assert");
 var lscache = require("../lib/lscache");
 
 suite('lscache', function() {
+  var originalConsole;
+
   setup(function() {
     // Reset localStorage before each test
     try {
       localStorage.clear();
     } catch(e) {}
+    originalConsole = window.console;
   });
 
   teardown(function() {
@@ -17,8 +20,8 @@ suite('lscache', function() {
     try {
       localStorage.clear();
     } catch(e) {}
-    //window.console = originalConsole;
-    //lscache.enableWarnings(false);
+    window.console = originalConsole;
+    lscache.enableWarnings(false);
   });
 
   test('Testing set() and get() with string', function() {
