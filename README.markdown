@@ -6,6 +6,8 @@ Entries which have no expiry are never removed automatically from the cache.
 
 Entries in the cache are optionally stored in a hierarchy of buckets, each of which is independant of the others.
 
+Based on: [https://github.com/pamelafox/lscache]
+
 Methods
 -------
 
@@ -13,7 +15,7 @@ The library exposes methods: `set()`, `get()`, `remove()`, `flush()`, `createBuc
 
 * * *
 
-### ls-cache.set
+### lscache.set
 Stores the value in localStorage. Expires after specified number of minutes.
 #### Arguments
 1. `key` (**string**)
@@ -22,7 +24,7 @@ Stores the value in localStorage. Expires after specified number of minutes.
 
 * * *
 
-### ls-cache.get
+### lscache.get
 Retrieves specified value from localStorage, if not expired.
 #### Arguments
 1. `key` (**string**)
@@ -31,26 +33,26 @@ Retrieves specified value from localStorage, if not expired.
 
 * * *
 
-### ls-cache.keys
+### lscache.keys
 Gets list of all keys in bucket
 #### Returns
 **Array** : Key names
 
 * * *
 
-### ls-cache.remove
+### lscache.remove
 Removes a value from localStorage.
 #### Arguments
 1. `key` (**string**)
 
 * * *
 
-### ls-cache.flush
+### lscache.flush
 Removes all ls-cache items in current bucket from localStorage without affecting other data.
 
 * * *
 
-### ls-cache.createBucket
+### lscache.createBucket
 Creates a sub-bucket which is completely independent. However, its expirable items may be cleared to make room for more keys.
 #### Arguments
 1. `bucket` (**string**)
@@ -60,62 +62,62 @@ Usage
 
 The interface should be familiar to those of you who have used `memcache`, and should be easy to understand for those of you who haven't.
 
-For example, you can store a string for 2 minutes using `ls-cache.set()`:
+For example, you can store a string for 2 minutes using `lscache.set()`:
 
 ```js
-ls-cache.set('greeting', 'Hello World!', 2);
+lscache.set('greeting', 'Hello World!', 2);
 ```
 
-You can then retrieve that string with `ls-cache.get()`:
+You can then retrieve that string with `lscache.get()`:
 
 ```js
-alert(ls-cache.get('greeting'));
+alert(lscache.get('greeting'));
 ```
 
-You can remove that string from the cache entirely with `ls-cache.remove()`:
+You can remove that string from the cache entirely with `lscache.remove()`:
 
 ```js
-ls-cache.remove('greeting');
+lscache.remove('greeting');
 ```
 
-You can remove all items from the cache entirely with `ls-cache.flush()`:
+You can remove all items from the cache entirely with `lscache.flush()`:
 
 ```js
-ls-cache.flush();
+lscache.flush();
 ```
 
 The library also takes care of serializing objects, so you can store more complex data:
 
 ```js
-ls-cache.set('data', {'name': 'Pamela', 'age': 26}, 2);
+lscache.set('data', {'name': 'Pamela', 'age': 26}, 2);
 ```
 
 And then when you retrieve it, you will get it back as an object:
 
 ```js
-alert(ls-cache.get('data').name);
+alert(lscache.get('data').name);
 ```
 
 If you have multiple instances of ls-cache running on the same domain, you can partition data in a certain bucket via:
 
 ```js
-bucket = ls-cache.createBucket("something");
+bucket = lscache.createBucket("something");
 bucket.set('response', '...', 2);
-ls-cache.set('path', '...', 2);
-ls-cache.flush(); //only removes 'path' which was set in the root bucket, not the sub-bucket
+lscache.set('path', '...', 2);
+lscache.flush(); //only removes 'path' which was set in the root bucket, not the sub-bucket
 ```
 
 Buckets are nestable:
 
 ```js
-bucket = ls-cache.createBucket("firstlevel");
+bucket = lscache.createBucket("firstlevel");
 bucket2 = bucket.createBucket("secondlevel");
 ```
 
 Browser Support
 ----------------
 
-The `ls-cache` library should work in all browsers where `localStorage` is supported.
+The `lscache` library should work in all browsers where `localStorage` is supported.
 A list of those is here:
 http://www.quirksmode.org/dom/html5.html
 
