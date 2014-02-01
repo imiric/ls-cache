@@ -1,7 +1,7 @@
 {
   "name": "ls-cache",
-  "version": "0.0.1",
-  "description": "lscache with browserify support",
+  "version": "0.2.0",
+  "description": "Browserify-friendly LocalStorage cache with object support and expiring entries",
   "main": "lib/ls-cache.js",
   "directories": {
     "test": "test"
