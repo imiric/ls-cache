@@ -11,7 +11,7 @@ Based on: [https://github.com/pamelafox/lscache]
 Methods
 -------
 
-The library exposes methods: `set()`, `get()`, `remove()`, `flush()`, `createBucket()` and `keys()`.
+The library exposes methods: `set()`, `get()`, `remove()`, `flush()`, `flushRecursive()`, `createBucket()` and `keys()`.
 
 * * *
 
@@ -49,6 +49,11 @@ Removes a value from localStorage.
 
 ### lscache.flush
 Removes all ls-cache items in current bucket from localStorage without affecting other data.
+
+* * *
+
+### lscache.flushRecursive
+Removes all ls-cache items in current bucket from localStorage and all sub-buckets
 
 * * *
 

@@ -91,6 +91,23 @@ suite('ls-cache', function() {
       assert.equal(sub.get(key2), 'bla', 'We expect sub-bucket value to still persist');
     });
 
+    test("Testing flushRecursive() affects sub-buckets only", function() {
+      sub1 = lscache.createBucket("sub1");
+      sub1a = sub1.createBucket("sub1a");
+      sub2 = lscache.createBucket("sub2");
+      var key = 'thekey';
+      lscache.set(key, 'bla', 100);
+      sub1.set(key, 'bla', 100);
+      sub1a.set(key, 'bla', 100);
+      sub2.set(key, 'bla', 100);
+
+      sub1.flushRecursive();
+      assert.equal(lscache.get(key), 'bla');
+      assert.equal(sub1.get(key), null);
+      assert.equal(sub1a.get(key), null);
+      assert.equal(sub2.get(key), 'bla');
+    });
+
     test("Testing buckets are independant", function() {
       sub = lscache.createBucket("tmp");
       var key = 'thekey';
