@@ -166,7 +166,8 @@ suite('ls-cache', function() {
       lscache.enableWarnings(true);
 
       lscache.set("key" + i, longString);
-      assert.equal(window.console.calls, 1, "We expect one warning to have been printed");
+      assert(window.console.calls >= 1, "We expect one warning to have been printed");
+      assert(window.console.calls <= 2, "We expect not too many warnings to have been printed");
     });
 
     test('Testing quota exceeding', function() {
